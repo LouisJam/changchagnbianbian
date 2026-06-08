@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>肠肠扁扁 · 宠咖</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --primary:        #19c8b9;
+      --primary-hover:  #3dd4c6;
+      --primary-active: #11a89b;
+      --primary-bg:     #e6f9f6;
+      --text:           #794f27;
+      --text-body:      #725d42;
+      --text-secondary: #9f927d;
+      --text-muted:     #8a7b66;
+      --text-disabled:  #c4b89e;
+      --bg:             #f8f8f0;
+      --bg-content:     rgb(247, 243, 223);
+      --bg-disabled:    #f0ece2;
+      --border:         #c4b89e;
+      --border-hover:   #a89878;
+      --border-strong:  #9f927d;
+      --success:        #6fba2c;
+      --success-active: #5a9e1e;
+      --warning:        #f5c31c;
+      --warning-active: #dba90e;
+      --error:          #e05a5a;
+      --error-active:   #c94444;
+      --focus-yellow:   #ffcc00;
+      --focus-yellow-d: #e0b800;
+      --focus-yellow-radio: #f5c31c;
+      --shadow-btn:     #bdaea0;
+      --shadow-input:   #d4c9b4;
+      --shadow-switch:  #5a9e1e;
+      --r-sm:   12px;
+      --r-base: 18px;
+      --r-lg:   24px;
+      --r-pill: 50px;
+      --ease:     cubic-bezier(0.4, 0, 0.2, 1);
+      --d-fast:   0.15s;
+      --d-base:   0.25s;
+      --d-slow:   0.35s;
+      --sidebar-w: 200px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Nunito, 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      color: var(--text-body);
+      background: var(--bg);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    #root { min-height: 100vh; }
+    .page-shell { display: flex; min-height: 100vh; }
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w);
+      background: var(--bg-content); border-right: 2px solid var(--border);
+      display: flex; flex-direction: column; z-index: 50; padding: 24px 0;
+    }
+    .sidebar-brand {
+      padding: 0 20px 20px; font-size: 18px; font-weight: 700;
+      letter-spacing: 0.02em; color: var(--text); border-bottom: 2px dashed var(--border);
+      margin-bottom: 12px;
+    }
+    .nav-item.ai-btn {
+      display: flex; align-items: center; gap: 10px; padding: 12px 20px;
+      font-size: 14px; font-weight: 600; letter-spacing: 0.02em;
+      color: var(--text-body); border: none; background: none; box-shadow: none;
+      width: 100%; text-align: left; justify-content: flex-start;
+      border-radius: 0; height: auto; min-height: 44px;
+    }
+    .nav-item.ai-btn:hover { background: rgba(25,200,185,0.1); color: var(--text); transform: none; }
+    .nav-item.ai-btn.active {
+      background: #0CC0B5; color: #FFF9E3; border-radius: 0 var(--r-pill) var(--r-pill) 0;
+      margin-right: 8px;
+    }
+    .animal-cursor, .animal-cursor * {
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M4 0 L4 18 L8 14 L12 22 L15 20 L11 13 L17 13 Z' fill='%2319c8b9' stroke='%2311a89b' stroke-width='1'/%3E%3C/svg%3E") 4 0, auto !important;
+    }
+    .main-area {
+      flex: 1; margin-left: var(--sidebar-w);
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    .top-bar {
+      position: sticky; top: 0; z-index: 40;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 16px 32px; background: rgba(248,248,240,0.92);
+      backdrop-filter: blur(4px); border-bottom: 2px solid rgba(196,184,158,0.4);
+    }
+    .main-content { flex: 1; padding: 32px; max-width: 1200px; width: 100%; margin: 0 auto; }
+    .mobile-header { display: none; }
+    .drawer-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(40,30,20,0.45);
+      z-index: 60; opacity: 0; pointer-events: none; transition: opacity var(--d-base) var(--ease);
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .mobile-drawer {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 80%;
+      max-width: 320px; background: var(--bg-content);
+      border-right: 2px solid var(--border); z-index: 70;
+      transform: translateX(-100%); transition: transform var(--d-base) var(--ease);
+      padding: 24px 0; display: flex; flex-direction: column;
+    }
+    .mobile-drawer.open { transform: translateX(0); }
+    .user-center { position: relative; display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+      width: 40px; height: 40px; border-radius: 50%; border: 2.5px solid var(--border);
+      background: linear-gradient(135deg, #82d5bb, #19c8b9); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff; font-size: 16px;
+    }
+    .user-menu {
+      position: absolute; top: calc(100% + 8px); right: 0; width: 160px;
+      background: var(--bg-content); border: 2px solid var(--border);
+      border-radius: var(--r-base); padding: 12px 0; z-index: 100;
+      box-shadow: 0 3px 10px rgba(61,52,40,0.10);
+    }
+    .user-menu-name {
+      padding: 8px 16px; font-weight: 700; color: var(--text);
+      border-bottom: 1px dashed var(--border); margin-bottom: 4px; font-size: 14px;
+    }
+    .user-menu-item.ai-btn {
+      display: flex; width: 100%; padding: 10px 16px; text-align: left;
+      background: none; border: none; box-shadow: none; height: auto;
+      font-size: 14px; font-weight: 500; color: var(--text-body);
+      justify-content: flex-start; border-radius: 0;
+    }
+    .user-menu-item.ai-btn:hover { background: rgba(25,200,185,0.1); color: var(--text); transform: none; }
+    .hero-row { display: flex; gap: 32px; margin-bottom: 32px; align-items: stretch; }
+    .carousel-wrap { width: 500px; flex-shrink: 0; }
+    .carousel {
+      position: relative; border-radius: 20px; overflow: hidden;
+      aspect-ratio: 5/4; background: var(--bg-content);
+    }
+    .carousel-slide {
+      position: absolute; inset: 0; opacity: 0; transition: opacity 0.5s var(--ease);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .carousel-slide.active { opacity: 1; z-index: 1; }
+    .carousel-dots {
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 2;
+    }
+    .carousel-dot {
+      width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff;
+      background: rgba(255,255,255,0.4); cursor: pointer; padding: 0;
+    }
+    .carousel-dot.active { background: #fff; }
+    .carousel-arrows {
+      position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 8px; z-index: 2; pointer-events: none;
+    }
+    .carousel-arrows > * { pointer-events: auto; }
+    .store-info { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+    .info-row { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; }
+    .info-label { font-weight: 700; color: var(--text); min-width: 72px; letter-spacing: 0.02em; }
+    .announce-section { margin-bottom: 32px; }
+    .announce-list { display: flex; flex-direction: column; gap: 12px; }
+    .announce-item { padding: 4px 0; }
+    .announce-date { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .announce-title { font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .featured-section { margin-top: 16px; }
+    .featured-row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .featured-col { flex: 1; min-width: 280px; }
+    .sticky-scroll, .emoji-scroll {
+      display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    }
+    .sticky-card, .emoji-card {
+      flex: 0 0 180px; scroll-snap-align: start; cursor: pointer;
+      transition: transform var(--d-base) var(--ease);
+    }
+    .sticky-card:hover, .emoji-card:hover { transform: translateY(-2px); }
+    .emoji-thumb {
+      width: 100%; aspect-ratio: 1; border-radius: var(--r-base);
+      display: flex; align-items: center; justify-content: center; font-size: 48px;
+    }
+    .placeholder-page { padding: 48px 0; text-align: center; }
+    .section-title { margin-bottom: 20px; }
+    .page-footer { margin-top: auto; }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-area { margin-left: 0; }
+      .mobile-header {
+        display: flex; align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 45; padding: 12px 16px;
+        background: var(--bg-content); border-bottom: 2px solid var(--border);
+      }
+      .mobile-title { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: 0.04em; }
+      .drawer-overlay { display: block; }
+      .top-bar { display: none; }
+      .main-content { padding: 16px; }
+      .hero-row { flex-direction: column; }
+      .carousel-wrap { width: 100%; }
+      .featured-row { flex-direction: column; }
+    }
+    @keyframes btn-loading { to { background-position: -28.28px 0; } }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes leafWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(12deg); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pop-check {
+      0% { transform: scale(0.4); } 60% { transform: scale(1.2); } 100% { transform: scale(1); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(8deg); }
+    }
+    @keyframes grasswave {
+      0%, 100% { background-position: 0% 0%; }
+      50% { background-position: 0% 100%; }
+    }
+    @keyframes loading-mask {
+      0% { --mask-r: 0%; } 100% { --mask-r: 150%; }
+    }
+    .ai-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      font-family: inherit; font-weight: 600; letter-spacing: 0.02em; line-height: 1;
+      border-width: 2px; border-style: solid; cursor: pointer;
+      transition: all var(--d-fast) var(--ease); text-decoration: none;
+    }
+    .ai-btn--small { height: 32px; padding: 0 16px; font-size: 12px; border-radius: 16px; }
+    .ai-btn--middle { height: 45px; padding: 0 20px; font-size: 14px; border-radius: 50px; }
+    .ai-btn--large { height: 48px; padding: 0 32px; font-size: 16px; border-radius: 24px; }
+    .ai-btn--primary { color: #794f27; background: #f8f8f0; border-color: #f8f8f0; box-shadow: 0 5px 0 0 #bdaea0; }
+    .ai-btn--primary:hover:not(:disabled) { box-shadow: 0 6px 0 0 #bdaea0; transform: translateY(-1px); }
+    .ai-btn--primary:active:not(:disabled) { box-shadow: 0 1px 0 0 #bdaea0; transform: translateY(2px); }
+    .ai-btn--primary:focus-visible { outline: 2px solid #19c8b9; outline-offset: 2px; }
+    .ai-btn--danger-primary { color: #fff; background: var(--error); border-color: var(--error); box-shadow: 0 5px 0 0 #c94444; }
+    .ai-btn--danger-primary:hover:not(:disabled) { box-shadow: 0 6px 0 0 #c94444; transform: translateY(-1px); }
+    .ai-btn--danger-primary:active:not(:disabled) { box-shadow: 0 1px 0 0 #c94444; transform: translateY(2px); }
+    .ai-btn--default, .ai-btn--dashed { background: #f8f8f0; border-color: #9f927d; color: var(--text-body); box-shadow: 0 2px 4px 0 rgba(61,52,40,0.06); }
+    .ai-btn--dashed { border-style: dashed; }
+    .ai-btn--default:hover:not(:disabled), .ai-btn--dashed:hover:not(:disabled) { color: #19c8b9; border-color: #19c8b9; box-shadow: 0 3px 10px 0 rgba(61,52,40,0.10); transform: translateY(-1px); }
+    .ai-btn--default:active:not(:disabled), .ai-btn--dashed:active:not(:disabled) { color: #11a89b; border-color: #11a89b; transform: translateY(0); box-shadow: 0 2px 4px 0 rgba(61,52,40,0.06); }
+    .ai-btn--text, .ai-btn--link { background: transparent; border-color: transparent; color: var(--text-body); box-shadow: none; }
+    .ai-btn--link { text-decoration: underline; }
+    .ai-btn--text:hover:not(:disabled), .ai-btn--link:hover:not(:disabled) { color: #19c8b9; }
+    .ai-btn--loading { background: #0ec4b6; background-image: repeating-linear-gradient(-45deg,#0ec4b6 0 10px,#01b0a7 10px 20px); background-size: 28.28px 28.28px; border: 4px solid #4de2da; color: #fff; box-shadow: none; animation: btn-loading 1s linear infinite; }
+    .ai-btn--ghost { background: transparent !important; box-shadow: none !important; }
+    .ai-btn--block { display: flex; width: 100%; }
+    .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
+    .ai-input-wrap { display: inline-flex; align-items: center; gap: 6px; width: 100%; }
+    .ai-input {
+      flex: 1; background: rgb(247,243,223); border: 2px solid #c4b89e; color: #725d42;
+      font-family: inherit; font-weight: 500; letter-spacing: 0.01em; outline: none;
+      transition: all var(--d-fast) var(--ease); width: 100%;
+    }
+    .ai-input::placeholder { color: #c4b89e; font-weight: 400; }
+    .ai-input--small { height: 32px; padding: 0 14px; font-size: 12px; border-radius: 40px; }
+    .ai-input--middle { height: 40px; padding: 0 18px; font-size: 14px; border-radius: 50px; }
+    .ai-input--large { height: 48px; padding: 0 22px; font-size: 16px; border-radius: 50px; }
+    .ai-input--shadow.ai-input--small { box-shadow: 0 2px 0 0 #d4c9b4; }
+    .ai-input--shadow.ai-input--middle { box-shadow: 0 3px 0 0 #d4c9b4; }
+    .ai-input--shadow.ai-input--large { box-shadow: 0 4px 0 0 #d4c9b4; }
+    .ai-input:hover:not(:disabled) { border-color: #a89878; }
+    .ai-input:focus { border-color: #ffcc00; box-shadow: 0 0 0 3px rgba(255,204,0,0.15); }
+    .ai-input--shadow:focus { box-shadow: 0 0 0 3px rgba(255,204,0,0.15), 0 3px 0 0 #e0b800; }
+    .ai-input--error { box-shadow: 0 3px 0 0 #c94444; }
+    .ai-input--warning { box-shadow: 0 3px 0 0 #dba90e; }
+    .ai-input:disabled { background: #ece8dc; color: #c4b89e; border-color: #d4c9b4; opacity: 0.6; }
+    .ai-input-affix { color: #a0936e; display: flex; align-items: center; }
+    .ai-input-clear { width: 20px; height: 20px; border-radius: 50%; border: none; background: none; color: #c4b89e; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .ai-input-clear:hover { background: rgba(114,93,66,0.1); color: #725d42; }
+    .ai-switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+    .ai-switch-track {
+      position: relative; min-width: 52px; height: 28px; border-radius: 50px;
+      background: #d4c9b4; border: 2.5px solid #c4b89e;
+      box-shadow: inset 0 2px 4px rgba(114,93,66,0.15); transition: all var(--d-base) var(--ease);
+    }
+    .ai-switch--small .ai-switch-track { min-width: 38px; height: 20px; }
+    .ai-switch-handle {
+      position: absolute; top: 50%; left: 2px; width: 21px; height: 21px;
+      background: rgb(247,243,223); border: 2.5px solid #c4b89e; border-radius: 50%;
+      transform: translateY(-50%); transition: left var(--d-base) var(--ease);
+    }
+    .ai-switch--small .ai-switch-handle { width: 14px; height: 14px; left: 1px; }
+    .ai-switch--checked .ai-switch-track { background: #86d67a; border-color: #6fba2c; box-shadow: inset 0 2px 4px rgba(90,158,30,0.20); }
+    .ai-switch--checked .ai-switch-handle { border-color: #6fba2c; left: calc(100% - 24px); }
+    .ai-switch--small.ai-switch--checked .ai-switch-handle { left: calc(100% - 16px); }
+    .ai-switch--checked:hover .ai-switch-track { background: #7ccc70; border-color: #5a9e1e; }
+    .ai-switch:hover:not(.ai-switch--checked) .ai-switch-track { border-color: #a89878; }
+    .ai-switch:focus-visible { outline: 2px solid #ffcc00; outline-offset: 2px; border-radius: 50px; }
+    .ai-switch--disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+    .ai-checkbox { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    .ai-checkbox-box {
+      display: flex; align-items: center; justify-content: center;
+      background: rgb(247,243,223); border: 2.5px solid #c4b89e; border-radius: 8px;
+      transition: all var(--d-fast) var(--ease); flex-shrink: 0;
+    }
+    .ai-checkbox--small .ai-checkbox-box { width: 18px; height: 18px; }
+    .ai-checkbox--middle .ai-checkbox-box { width: 22px; height: 22px; }
+    .ai-checkbox--large .ai-checkbox-box { width: 28px; height: 28px; }
+    .ai-checkbox:hover .ai-checkbox-box { border-color: #19c8b9; transform: translateY(-1px); }
+    .ai-checkbox--checked .ai-checkbox-box { background: #19c8b9; border-color: #11a89b; animation: pop-check 0.15s var(--ease); }
+    .ai-checkbox-label { color: #725d42; font-weight: 500; letter-spacing: 0.01em; }
+    .ai-checkbox--small .ai-checkbox-label { font-size: 12px; }
+    .ai-checkbox--middle .ai-checkbox-label { font-size: 14px; }
+    .ai-checkbox--large .ai-checkbox-label { font-size: 16px; }
+    .ai-checkbox--disabled { opacity: 0.55; cursor: not-allowed; }
+    .ai-radio-group { display: flex; flex-wrap: wrap; }
+    .ai-radio-group--horizontal { gap: 16px; }
+    .ai-radio-group--vertical { flex-direction: column; gap: 8px; }
+    .ai-radio-item { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    .ai-radio-circle {
+      display: flex; align-items: center; justify-content: center;
+      background: rgb(247,243,223); border: 2px solid #c4b89e; transition: all var(--d-fast) var(--ease);
+    }
+    .ai-radio--small .ai-radio-circle { width: 18px; height: 18px; border-radius: 12px; }
+    .ai-radio--middle .ai-radio-circle { width: 22px; height: 22px; border-radius: 14px; }
+    .ai-radio--large .ai-radio-circle { width: 28px; height: 28px; border-radius: 16px; }
+    .ai-radio-item:hover .ai-radio-circle { border-color: #19c8b9; transform: translateY(-1px); }
+    .ai-radio-item--checked .ai-radio-circle { background: #19c8b9; border-color: #11a89b; animation: pop-check 0.15s var(--ease); }
+    .ai-radio-label { color: #725d42; font-weight: 500; letter-spacing: 0.01em; }
+    .ai-radio--small .ai-radio-label { font-size: 12px; }
+    .ai-radio--middle .ai-radio-label { font-size: 14px; }
+    .ai-radio--large .ai-radio-label { font-size: 16px; }
+    .ai-radio-item--checked .ai-radio-label { color: #794f27; }
+    .ai-radio-item--disabled { opacity: 0.55; cursor: not-allowed; }
+    .ai-card {
+      border-radius: 20px; padding: 16px 24px; color: #725d42; font-weight: 500;
+      transition: transform 0.3s var(--ease); cursor: pointer;
+    }
+    .ai-card:hover { transform: translateY(-2px); }
+    .ai-card--dashed { background: rgb(250,248,242); border: 2px dashed #e8dcc8; cursor: default; }
+    .ai-card--dashed:hover { border-color: #d4c4a8; transform: none; }
+    .ai-card--none { background: rgb(247,243,223); }
+    .ai-title-wrap { display: inline-flex; position: relative; height: 2em; padding: 0 1.6em; font-weight: 800; line-height: 1; letter-spacing: 0.04em; filter: drop-shadow(0 0.08em 0.12em rgba(0,0,0,0.05)); align-items: center; }
+    .ai-title--small { font-size: 14px; } .ai-title--middle { font-size: 20px; } .ai-title--large { font-size: 28px; }
+    .ai-ribbon-text { font-weight: 900; padding-top: 0.11em; z-index: 4; position: relative; color: var(--rt); }
+    .ai-ribbon-back { position: absolute; z-index: 1; width: 1.7em; height: 1.7em; bottom: -0.4em; background: var(--rb); }
+    .ai-ribbon-back--left { left: 0; clip-path: polygon(100% 0%,100% 100%,0% 100%,30% 50%,0% 0%); }
+    .ai-ribbon-back--right { right: 0; clip-path: polygon(0% 0%,100% 0%,70% 50%,100% 100%,0% 100%); }
+    .ai-ribbon-fold { position: absolute; z-index: 2; top: calc(100% - 0.04em); width: 0; height: 0; }
+    .ai-ribbon-fold--left { left: 0; border-width: 0 0.95em 0.45em 0; border-style: solid; border-color: transparent var(--rk) transparent transparent; }
+    .ai-ribbon-fold--right { right: 0; border-width: 0 0 0.45em 0.95em; border-style: solid; border-color: transparent transparent transparent var(--rk); }
+    .ai-ribbon-front {
+      position: absolute; z-index: 3; inset: 0 0.1em;
+      border-radius: 0.2em; background: var(--rf);
+      transform: perspective(11.5em) rotateX(3deg);
+      box-shadow: inset 0 -0.06em 0 rgba(0,0,0,0.05);
+    }
+    .ai-collapse { background: rgb(247,243,223); border: 2px solid #9f927d; border-radius: 18px; margin-bottom: 12px; overflow: hidden; }
+    .ai-collapse-header { display: flex; align-items: center; gap: 12px; padding: 16px 24px; font-size: 16px; font-weight: 600; line-height: 1.4; cursor: pointer; }
+    .ai-collapse-icon {
+      width: 28px; height: 28px; border-radius: 50%; background: #19c8b9; color: #fff;
+      font-weight: 700; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 4px rgba(25,200,185,0.3); flex-shrink: 0; transition: transform var(--d-base) var(--ease);
+    }
+    .ai-collapse--open .ai-collapse-icon { transform: rotate(180deg); }
+    .ai-collapse-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s var(--ease); }
+    .ai-collapse--open .ai-collapse-body { grid-template-rows: 1fr; }
+    .ai-collapse-inner { overflow: hidden; }
+    .ai-collapse-content { padding: 0 24px 16px; color: var(--text-body); }
+    .ai-tabs { background: rgb(247,243,223); border: 2px solid #9f927d; border-radius: 24px; overflow: hidden; }
+    .ai-tabs-list { display: flex; gap: 6px; padding: 16px; background: rgba(255,255,255,0.6); border-bottom: 2px solid #c4b89e; flex-wrap: wrap; }
+    .ai-tab-item {
+      padding: 8px 16px; border-radius: 24px; color: #725d42; font-weight: 500;
+      cursor: pointer; border: none; background: none; font-family: inherit; font-size: 14px;
+      transition: all var(--d-fast) var(--ease); position: relative;
+    }
+    .ai-tab-item:hover { background: rgba(25,200,185,0.1); }
+    .ai-tab-item--active { background: #0CC0B5; color: #FFF9E3; font-weight: 600; }
+    .ai-tabs-panel { padding: 20px 24px; }
+    .ai-select { position: relative; display: inline-block; }
+    .ai-select-trigger {
+      display: flex; align-items: center; gap: 8px; background: #fff;
+      border: 2px solid #e8dcc8; border-radius: 12px; padding: 8px 13px;
+      color: #725d42; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 14px;
+    }
+    .ai-select-trigger:hover { border-color: #d4c4a8; background: #fffdf7; }
+    .ai-select--open .ai-select-trigger { color: #19c8b9; }
+    .ai-select-arrow { color: #a09080; transition: transform var(--d-fast) var(--ease); }
+    .ai-select--open .ai-select-arrow { transform: rotate(180deg); color: #19c8b9; }
+    .ai-select-placeholder { color: #a09080; }
+    .ai-select-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; min-width: 100%;
+      background: #FFEEA0; border-radius: 28px; padding: 12px 0; z-index: 100;
+      opacity: 0; pointer-events: none; transform: translateY(-4px);
+      transition: all 0.2s var(--ease);
+    }
+    .ai-select--open .ai-select-dropdown { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .ai-select-option {
+      display: flex; align-items: center; padding: 10px 30px 10px 14px;
+      font-size: 14px; font-weight: 500; color: #725d42; cursor: pointer; position: relative;
+    }
+    .ai-select-option:hover { background: rgba(114,93,66,0.06); }
+    .ai-select-option--selected { font-weight: 700; }
+    .ai-select-option--selected::before {
+      content: ''; position: absolute; inset: 4px 8px; background: rgba(255,255,255,0.5);
+      border-radius: 50px; z-index: -1;
+    }
+    .ai-tooltip-wrap { position: relative; display: inline-flex; }
+    .ai-tooltip {
+      position: absolute; z-index: 100; pointer-events: none; opacity: 0;
+      transition: opacity var(--d-fast) var(--ease);
+    }
+    .ai-tooltip-wrap:hover .ai-tooltip, .ai-tooltip-wrap:focus-within .ai-tooltip { opacity: 1; }
+    .ai-tooltip--default {
+      background: rgb(247,243,223); border: 2px solid #c4b89e; border-radius: 16px;
+      padding: 6px 12px; max-width: 240px; font-size: 12px; font-weight: 500;
+      color: #725d42; line-height: 1.5; box-shadow: 0 3px 10px rgba(61,52,40,0.10);
+    }
+    .ai-tooltip--top { bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); }
+    .ai-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(40,30,20,0.45);
+      backdrop-filter: blur(2px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .ai-modal-content {
+      clip-path: url(#animal-modal-clip); background: rgb(247,243,223);
+      padding: 48px 48px 32px; color: #725d42; max-width: 480px; width: 100%; position: relative;
+    }
+    .ai-modal-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 16px; letter-spacing: 0.02em; }
+    .ai-modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+    .ai-modal-confirm {
+      background: #ffcc00; color: #725d42; border: none; border-radius: 50px;
+      padding: 10px 28px; font-weight: 600; cursor: pointer; font-family: inherit;
+      box-shadow: 0 5px 0 0 #e0b800; letter-spacing: 0.02em;
+    }
+    .ai-modal-confirm:hover { box-shadow: 0 6px 0 0 #e0b800; transform: translateY(-1px); }
+    .ai-modal-confirm:active { box-shadow: 0 1px 0 0 #e0b800; transform: translateY(2px); }
+    .ai-modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; cursor: pointer; color: var(--text-muted); }
+    .ai-loading-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,1); overflow: hidden; z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ai-table-wrap { background: rgb(247,243,223); border-radius: 20px; padding: 6px; overflow: hidden; position: relative; }
+    .ai-table { width: 100%; border-collapse: collapse; }
+    .ai-table th { padding: 16px 20px; font-size: 14px; font-weight: 700; color: #725d42; letter-spacing: 0.02em; text-align: left; position: relative; }
+    .ai-table th::after, .ai-table td::after {
+      content: ''; position: absolute; left: 20px; right: 20px; bottom: 0; height: 1px;
+      background: repeating-linear-gradient(90deg, rgb(240,232,216) 0 6px, transparent 6px 12px);
+    }
+    .ai-table td { padding: 14px 20px; font-size: 14px; font-weight: 500; color: #725d42; line-height: 1.6; position: relative; }
+    .ai-table tr:nth-child(even) td { background: rgba(248,248,240,0.6); }
+    .ai-table tr:hover td {
+      background: repeating-linear-gradient(-45deg,rgba(25,200,185,0.6) 0 10px,rgba(14,196,182,0.6) 10px 20px);
+      background-size: 28.28px 28.28px; color: #3d2e1e;
+    }
+    .ai-time {
+      display: inline-flex; align-items: center; gap: 24px; padding: 16px 36px;
+      background: linear-gradient(180deg,#fff 0%,#f8f8f0 100%);
+      border: 3px solid #d4cfc3; border-radius: 18px;
+    }
+    .ai-time-date { padding-right: 24px; border-right: 3px solid rgba(159,146,125,0.35); }
+    .ai-time-weekday { color: #6fba2c; font-weight: 900; font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; }
+    .ai-time-md { color: #8b7355; font-weight: 800; font-size: 22px; }
+    .ai-time-clock { color: #8b7355; font-weight: 900; font-size: 48px; letter-spacing: 2px; }
+    .ai-time-colon { animation: blink 1s step-end infinite; }
+    .ai-divider { height: 12px; background: center/contain no-repeat; border: none; margin: 16px 0; }
+    .ai-divider--line-brown { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12'%3E%3Crect y='5' width='200' height='2' fill='%23D8D0C3'/%3E%3C/svg%3E"); }
+    .ai-divider--line-teal { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12'%3E%3Crect y='5' width='200' height='2' fill='%2319c8b9'/%3E%3C/svg%3E"); }
+    .ai-divider--dashed-brown { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12'%3E%3Cline x1='0' y1='6' x2='200' y2='6' stroke='%23D8D0C3' stroke-width='2' stroke-dasharray='6 6'/%3E%3C/svg%3E"); }
+    .ai-footer-tree {
+      width: 100%; height: 60px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60'%3E%3Cellipse cx='60' cy='50' rx='30' ry='20' fill='%238ac68a'/%3E%3Cellipse cx='50' cy='35' rx='22' ry='18' fill='%236fba2c'/%3E%3Cellipse cx='340' cy='50' rx='30' ry='20' fill='%238ac68a'/%3E%3Cellipse cx='350' cy='35' rx='22' ry='18' fill='%236fba2c'/%3E%3Crect x='55' y='40' width='10' height='20' fill='%239a835a'/%3E%3Crect x='345' y='40' width='10' height='20' fill='%239a835a'/%3E%3C/svg%3E") bottom center/cover;
+    }
+    .ai-footer-sea {
+      width: 100%; height: 80px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80'%3E%3Crect fill='%2398D2E3' width='400' height='50'/%3E%3Crect y='50' fill='%23008077' width='400' height='30'/%3E%3Cpath d='M0 50 Q50 40 100 50 T200 50 T300 50 T400 50 V80 H0Z' fill='%23327A93'/%3E%3Ccircle cx='80' cy='65' r='8' fill='%23EC7175'/%3E%3Ccircle cx='320' cy='60' r='6' fill='%23EC7175'/%3E%3C/svg%3E") center/contain no-repeat;
+    }
+    .ai-code-block {
+      padding: 20px 24px; background: #2b2118; border: 1px solid #3d3028;
+      border-radius: 20px; font-size: 14px; line-height: 1.7; tab-size: 4;
+      font-family: 'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;
+      font-weight: 600; white-space: pre; overflow: auto; color: #e8d5bc;
+    }
+    .login-qr {
+      width: 160px; height: 160px; margin: 16px auto; border-radius: 12px;
+      background: repeating-linear-gradient(0deg,#725d42 0 4px,#f8f8f0 4px 8px);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text-muted); text-align: center; padding: 8px;
+    }
+    .ai-card--pattern-default { background: radial-gradient(circle,rgba(196,184,158,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(216,208,195,0.12) 1px,transparent 1px) 7px 7px/14px 14px,rgb(247,243,223); border: 1.5px solid #c4b89e; color: #725d42; }
+    .ai-card--pattern-app-pink { background: radial-gradient(circle,rgba(248,166,178,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(255,200,210,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#fde4e8; border: 1.5px solid #f8a6b2; color: #a85565; }
+    .ai-card--pattern-purple { background: radial-gradient(circle,rgba(183,125,238,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(200,160,245,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#ede0fa; border: 1.5px solid #b77dee; color: #6a3a9a; }
+    .ai-card--pattern-app-blue { background: radial-gradient(circle,rgba(136,157,240,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(170,185,245,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#e4e9fa; border: 1.5px solid #889df0; color: #3d4a8a; }
+    .ai-card--pattern-app-yellow { background: radial-gradient(circle,rgba(247,205,103,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(250,220,140,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#faf0d0; border: 1.5px solid #f7cd67; color: #725d42; }
+    .ai-card--pattern-app-orange { background: radial-gradient(circle,rgba(229,146,102,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(240,180,150,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#fae8dc; border: 1.5px solid #e59266; color: #8a4a28; }
+    .ai-card--pattern-app-teal { background: radial-gradient(circle,rgba(130,213,187,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(170,230,210,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#dff5ec; border: 1.5px solid #82d5bb; color: #2a6a50; }
+    .ai-card--pattern-app-green { background: radial-gradient(circle,rgba(138,198,138,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(175,220,175,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#e4f2e4; border: 1.5px solid #8ac68a; color: #3d5a1a; }
+    .ai-card--pattern-app-red { background: radial-gradient(circle,rgba(252,115,109,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(255,160,155,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#fde4e3; border: 1.5px solid #fc736d; color: #8a2828; }
+    .ai-card--pattern-lime-green { background: radial-gradient(circle,rgba(209,218,73,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(225,230,130,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#f2f5d0; border: 1.5px solid #d1da49; color: #3d5a1a; }
+    .ai-card--pattern-yellow-green { background: radial-gradient(circle,rgba(236,223,82,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(245,235,130,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#f8f5d0; border: 1.5px solid #ecdf52; color: #725d42; }
+    .ai-card--pattern-brown { background: radial-gradient(circle,rgba(154,131,90,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(180,160,120,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#ebe4d4; border: 1.5px solid #9a835a; color: #3d2e1e; }
+    .ai-card--pattern-warm-peach-pink { background: radial-gradient(circle,rgba(225,140,111,0.18) 1.5px,transparent 1.5px) 0 0/28px 28px,radial-gradient(circle,rgba(240,180,160,0.12) 1px,transparent 1px) 7px 7px/14px 14px,#fae8e0; border: 1.5px solid #e18c6f; color: #6a3a28; }
+    .ai-card--color-app-pink { background: #f8a6b2; color: #fff; }
+    .ai-card--color-purple { background: #b77dee; color: #fff; }
+    .ai-card--color-app-blue { background: #889df0; color: #fff; }
+    .ai-card--color-app-yellow { background: #f7cd67; color: #725d42; }
+    .ai-card--color-app-orange { background: #e59266; color: #fff; }
+    .ai-card--color-app-teal { background: #82d5bb; color: #fff; }
+    .ai-card--color-app-green { background: #8ac68a; color: #fff; }
+    .ai-card--color-app-red { background: #fc736d; color: #fff; }
+    .ai-card--color-lime-green { background: #d1da49; color: #3d5a1a; }
+    .ai-card--color-yellow-green { background: #ecdf52; color: #725d42; }
+    .ai-card--color-brown { background: #9a835a; color: #fff; }
+    .ai-card--color-warm-peach-pink { background: #e18c6f; color: #fff; }
+  </style>
+</head>
+<body>
+  <svg style="position:absolute;width:0;height:0" aria-hidden="true">
+    <defs>
+      <clipPath id="animal-modal-clip" clipPathUnits="objectBoundingBox">
+        <path d="M0.501,0.005 L0.501,0.005 L0.523,0.005 L0.549,0.006 C0.704,0.01,0.796,0.017,0.825,0.027 L0.827,0.028 C0.872,0.045,0.939,0.044,0.978,0.17 C1,0.254,1,0.365,0.99,0.505 L0.988,0.513 C0.979,0.558,0.971,0.598,0.965,0.633 C0.956,0.689,0.979,0.77,0.964,0.865 C0.953,0.928,0.921,0.966,0.869,0.979 C0.821,0.986,0.773,0.992,0.726,0.995 L0.712,0.996 L0.694,0.997 C0.648,1,0.586,1,0.507,1 L0.501,1 L0.464,1 C0.385,1,0.325,0.998,0.283,0.995 C0.234,0.992,0.184,0.987,0.133,0.979 C0.081,0.966,0.05,0.928,0.039,0.865 C0.023,0.77,0.047,0.689,0.037,0.633 C0.031,0.595,0.023,0.552,0.013,0.505 C-0.006,0.365,-0.002,0.254,0.024,0.17 C0.064,0.045,0.13,0.045,0.174,0.028 L0.175,0.028 C0.204,0.017,0.303,0.009,0.474,0.005 L0.501,0.005"/>
+      </clipPath>
+    </defs>
+  </svg>
+  <div id="root"></div>
+  <script type="text/babel" data-presets="react,typescript">
+    const { useState, useEffect, useRef, useCallback, useMemo, createElement: h, Fragment } = React;
+
+    const TITLE_COLORS = {
+      'default-green': { '--rf':'#27d039','--rb':'#20992a','--rk':'#115017','--rt':'#fff' },
+      'app-pink': { '--rf':'#f8a6b2','--rb':'#e06880','--rk':'#a03060','--rt':'#fff' },
+      purple: { '--rf':'#b77dee','--rb':'#9050d0','--rk':'#5a1a9a','--rt':'#fff' },
+      'app-blue': { '--rf':'#889df0','--rb':'#5068d8','--rk':'#2030a0','--rt':'#fff' },
+      'app-yellow': { '--rf':'#f7cd67','--rb':'#d4a030','--rk':'#8a6010','--rt':'#725d42' },
+      'app-orange': { '--rf':'#e59266','--rb':'#c06a30','--rk':'#7a3a10','--rt':'#fff' },
+      'app-teal': { '--rf':'#82d5bb','--rb':'#40a880','--rk':'#186048','--rt':'#fff' },
+      'app-green': { '--rf':'#8ac68a','--rb':'#509050','--rk':'#205020','--rt':'#fff' },
+      'app-red': { '--rf':'#fc736d','--rb':'#d43030','--rk':'#900010','--rt':'#fff' },
+      'lime-green': { '--rf':'#d1da49','--rb':'#90a010','--rk':'#485800','--rt':'#3d5a1a' },
+      'yellow-green': { '--rf':'#ecdf52','--rb':'#c0b010','--rk':'#706800','--rt':'#725d42' },
+      brown: { '--rf':'#9a835a','--rb':'#705830','--rk':'#3a2810','--rt':'#fff' },
+      'warm-peach-pink': { '--rf':'#e18c6f','--rb':'#b85a30','--rk':'#6a2a10','--rt':'#fff' },
+    };
+
+    const NAV_ITEMS = [
+      { key: 'home', label: '首页', icon: '🏠' },
+      { key: 'staff', label: '员工介绍', icon: '👥' },
+      { key: 'menu', label: '饮品甜品', icon: '☕' },
+      { key: 'messages', label: '留言墙', icon: '💬' },
+      { key: 'emoji', label: '表情包墙', icon: '😺' },
+      { key: 'ranking', label: '最佳员工榜', icon: '🏆' },
+    ];
+
+    const CAROUSEL_SLIDES = [
+      { id: 1, gradient: 'linear-gradient(135deg,#82d5bb 0%,#19c8b9 50%,#f7cd67 100%)', label: '🐱 萌宠下午茶' },
+      { id: 2, gradient: 'linear-gradient(135deg,#f8a6b2 0%,#e18c6f 50%,#f7cd67 100%)', label: '🐶 撸猫撸狗天堂' },
+      { id: 3, gradient: 'linear-gradient(135deg,#889df0 0%,#b77dee 50%,#82d5bb 100%)', label: '🌿 治愈系空间' },
+      { id: 4, gradient: 'linear-gradient(135deg,#8ac68a 0%,#d1da49 50%,#ecdf52 100%)', label: '☕ 精品手冲咖啡' },
+    ];
+
+    const ANNOUNCEMENTS = [
+      { id: 1, date: '2026-06-05', title: '端午假期营业时间调整', content: '6月8日至6月10日营业时间调整为 10:00 - 20:00，欢迎携宠前来！' },
+      { id: 2, date: '2026-06-01', title: '新品上市：芒果椰椰拿铁', content: '夏日限定芒果椰椰拿铁现已上市，第二杯半价，快来尝鲜～' },
+      { id: 3, date: '2026-05-28', title: '会员积分兑换活动', content: '即日起至月底，积分可兑换限定宠物周边，详情咨询店内员工。' },
+    ];
+
+    const FEATURED_STICKIES = [
+      { id: 1, text: '店里的橘猫太可爱了！', author: '小鱼', color: 'app-pink' },
+      { id: 2, text: '拿铁拉花绝了 ☕', author: '阿狸', color: 'app-yellow' },
+      { id: 3, text: '周末带狗子来社交', author: '旺财妈', color: 'app-teal' },
+      { id: 4, text: '甜品也好好吃！', author: '甜甜', color: 'app-orange' },
+    ];
+
+    const FEATURED_EMOJIS = [
+      { id: 1, emoji: '😸', name: '扁扁微笑' },
+      { id: 2, emoji: '🐾', name: '肉垫印' },
+      { id: 3, emoji: '☕', name: '咖啡喵' },
+      { id: 4, emoji: '🍰', name: '甜品喵' },
+      { id: 5, emoji: '🌸', name: '春日喵' },
+    ];
+
+    function useIsMobile(breakpoint = 768) {
+      const [mobile, setMobile] = useState(window.innerWidth <= breakpoint);
+      useEffect(() => {
+        const fn = () => setMobile(window.innerWidth <= breakpoint);
+        window.addEventListener('resize', fn);
+        return () => window.removeEventListener('resize', fn);
+      }, [breakpoint]);
+      return mobile;
+    }
+
+    function Icon({ name, size = 16, color = 'currentColor' }) {
+      const paths = {
+        'arrow-down': 'M4 6l6 6 6-6', 'arrow-up': 'M4 14l6-6 6 6',
+        check: 'M3 10l5 5 10-10', close: 'M6 6l12 12M18 6L6 18',
+        copy: 'M8 4h10v14H8z M6 8H4v12h10', menu: 'M4 7h16M4 12h16M4 17h16',
+        search: 'M10 16a6 6 0 100-12 6 6 0 000 12z M18 18l-4-4',
+        leaf: 'M12 3C8 8 6 14 12 21 18 14 16 8 12 3z', star: 'M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z',
+        trash: 'M6 6h12l-1 14H7L6 6z M9 6V4h6v2',
+      };
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
+          <path d={paths[name] || paths.star} />
+        </svg>
+      );
+    }
+
+    function Button({ type = 'default', size = 'middle', loading, disabled, ghost, block, children, onClick, className = '', ...rest }) {
+      const cls = ['ai-btn', `ai-btn--${size}`];
+      if (loading) cls.push('ai-btn--loading');
+      else if (type === 'primary') cls.push('ai-btn--primary');
+      else if (type === 'danger' && rest.primary) cls.push('ai-btn--danger-primary');
+      else cls.push(`ai-btn--${type}`);
+      if (ghost) cls.push('ai-btn--ghost');
+      if (block) cls.push('ai-btn--block');
+      if (className) cls.push(className);
+      return <button type="button" className={cls.join(' ')} disabled={disabled || loading} onClick={onClick} {...rest}>{children}</button>;
+    }
+
+    function Input({ size = 'middle', shadow, status, disabled, value, onChange, placeholder, prefix, suffix, allowClear, className = '', ...rest }) {
+      const cls = ['ai-input', `ai-input--${size}`];
+      if (shadow) cls.push('ai-input--shadow');
+      if (status === 'error') cls.push('ai-input--error');
+      if (status === 'warning') cls.push('ai-input--warning');
+      return (
+        <div className={`ai-input-wrap ${className}`}>
+          {prefix && <span className="ai-input-affix">{prefix}</span>}
+          <input className={cls.join(' ')} disabled={disabled} value={value} onChange={onChange} placeholder={placeholder} {...rest} />
+          {allowClear && value && <button type="button" className="ai-input-clear" onClick={() => onChange?.({ target: { value: '' } })}><Icon name="close" size={12} /></button>}
+          {suffix && <span className="ai-input-affix">{suffix}</span>}
+        </div>
+      );
+    }
+
+    function Switch({ checked, onChange, size, disabled, loading, className = '' }) {
+      const cls = ['ai-switch', size === 'small' && 'ai-switch--small', checked && 'ai-switch--checked', disabled && 'ai-switch--disabled', className].filter(Boolean).join(' ');
+      return (
+        <div className={cls} role="switch" aria-checked={checked} tabIndex={disabled ? -1 : 0}
+          onClick={() => !disabled && !loading && onChange?.(!checked)}
+          onKeyDown={e => e.key === ' ' && !disabled && onChange?.(!checked)}>
+          <div className="ai-switch-track"><div className="ai-switch-handle" /></div>
+        </div>
+      );
+    }
+
+    function Checkbox({ checked, onChange, disabled, size = 'middle', children }) {
+      const cls = ['ai-checkbox', `ai-checkbox--${size}`, checked && 'ai-checkbox--checked', disabled && 'ai-checkbox--disabled'].filter(Boolean).join(' ');
+      return (
+        <label className={cls} onClick={e => { e.preventDefault(); !disabled && onChange?.(!checked); }}>
+          <span className="ai-checkbox-box">{checked && <Icon name="check" size={size === 'large' ? 16 : 12} color="#fff" />}</span>
+          {children && <span className="ai-checkbox-label">{children}</span>}
+        </label>
+      );
+    }
+
+    function Radio({ options = [], value, onChange, size = 'middle', direction = 'horizontal', disabled }) {
+      return (
+        <div className={`ai-radio-group ai-radio-group--${direction} ai-radio--${size}`} role="radiogroup">
+          {options.map(opt => {
+            const sel = value === opt.value;
+            const dis = disabled || opt.disabled;
+            return (
+              <label key={opt.value} className={['ai-radio-item', sel && 'ai-radio-item--checked', dis && 'ai-radio-item--disabled'].filter(Boolean).join(' ')}
+                onClick={e => { e.preventDefault(); !dis && onChange?.(opt.value); }}>
+                <span className="ai-radio-circle">{sel && <svg width={size === 'small' ? 10 : size === 'large' ? 16 : 12} height={size === 'small' ? 10 : size === 'large' ? 16 : 12} viewBox="0 0 16 16"><path d="M2 8L6 12L14 4" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>}</span>
+                <span className="ai-radio-label">{opt.label}</span>
+              </label>
+            );
+          })}
+        </div>
+      );
+    }
+
+    function Card({ pattern = 'none', color, type, children, className = '', onClick, style, ...rest }) {
+      const cls = ['ai-card', className];
+      if (type === 'dashed') cls.push('ai-card--dashed');
+      else if (pattern && pattern !== 'none') cls.push(`ai-card--pattern-${pattern}`);
+      else if (color) cls.push(`ai-card--color-${color}`);
+      else cls.push('ai-card--none');
+      return <div className={cls.join(' ')} onClick={onClick} style={style} {...rest}>{children}</div>;
+    }
+
+    function Title({ color = 'default-green', size = 'middle', children, className = '' }) {
+      const vars = TITLE_COLORS[color] || TITLE_COLORS['default-green'];
+      return (
+        <span className={`ai-title-wrap ai-title--${size} ${className}`} style={vars}>
+          <span className="ai-ribbon-back ai-ribbon-back--left" />
+          <span className="ai-ribbon-back ai-ribbon-back--right" />
+          <span className="ai-ribbon-fold ai-ribbon-fold--left" />
+          <span className="ai-ribbon-fold ai-ribbon-fold--right" />
+          <span className="ai-ribbon-front" />
+          <span className="ai-ribbon-text">{children}</span>
+        </span>
+      );
+    }
+
+    function Collapse({ items = [], defaultActiveKey, accordion = true }) {
+      const [active, setActive] = useState(defaultActiveKey ? (Array.isArray(defaultActiveKey) ? defaultActiveKey : [defaultActiveKey]) : []);
+      const toggle = (key) => {
+        if (accordion) setActive(prev => prev.includes(key) ? [] : [key]);
+        else setActive(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+      };
+      return (
+        <div>{items.map(item => {
+          const open = active.includes(item.key);
+          return (
+            <div key={item.key} className={`ai-collapse ${open ? 'ai-collapse--open' : ''}`}>
+              <div className="ai-collapse-header" onClick={() => toggle(item.key)}>
+                <span className="ai-collapse-icon">{open ? '−' : '+'}</span>
+                <span>{item.label}</span>
+              </div>
+              <div className="ai-collapse-body"><div className="ai-collapse-inner"><div className="ai-collapse-content">{item.children}</div></div></div>
+            </div>
+          );
+        })}</div>
+      );
+    }
+
+    function Tabs({ items = [], defaultActiveKey }) {
+      const [active, setActive] = useState(defaultActiveKey || items[0]?.key);
+      const current = items.find(i => i.key === active);
+      return (
+        <div className="ai-tabs">
+          <div className="ai-tabs-list">{items.map(item => (
+            <button key={item.key} type="button" className={`ai-tab-item ${active === item.key ? 'ai-tab-item--active' : ''}`} onClick={() => setActive(item.key)}>{item.label}</button>
+          ))}</div>
+          <div className="ai-tabs-panel">{current?.children}</div>
+        </div>
+      );
+    }
+
+    function Select({ options = [], value, onChange, placeholder = '请选择' }) {
+      const [open, setOpen] = useState(false);
+      const ref = useRef(null);
+      const selected = options.find(o => o.value === value);
+      useEffect(() => {
+        const fn = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+        document.addEventListener('mousedown', fn);
+        return () => document.removeEventListener('mousedown', fn);
+      }, []);
+      return (
+        <div ref={ref} className={`ai-select ${open ? 'ai-select--open' : ''}`}>
+          <div className="ai-select-trigger" onClick={() => setOpen(!open)}>
+            <span className={selected ? '' : 'ai-select-placeholder'}>{selected?.label || placeholder}</span>
+            <span className="ai-select-arrow"><Icon name="arrow-down" size={14} /></span>
+          </div>
+          <div className="ai-select-dropdown">{options.map(opt => (
+            <div key={opt.value} className={`ai-select-option ${value === opt.value ? 'ai-select-option--selected' : ''}`}
+              onClick={() => { onChange?.(opt.value); setOpen(false); }}>{opt.label}</div>
+          ))}</div>
+        </div>
+      );
+    }
+
+    function Tooltip({ title, children, variant = 'default', placement = 'top' }) {
+      return (
+        <span className="ai-tooltip-wrap">
+          {children}
+          <span className={`ai-tooltip ai-tooltip--${variant} ai-tooltip--${placement}`}>{title}</span>
+        </span>
+      );
+    }
+
+    function Modal({ open, onClose, title, children, onOk, okText = '确定', cancelText = '取消', showCancel = true }) {
+      if (!open) return null;
+      return (
+        <div className="ai-modal-backdrop" onClick={e => e.target === e.currentTarget && onClose?.()}>
+          <div className="ai-modal-content">
+            <button type="button" className="ai-modal-close" onClick={onClose}><Icon name="close" size={20} /></button>
+            {title && <div className="ai-modal-title">{title}</div>}
+            {children}
+            <div className="ai-modal-footer">
+              {showCancel && <Button type="default" onClick={onClose}>{cancelText}</Button>}
+              <button type="button" className="ai-modal-confirm" onClick={onOk || onClose}>{okText}</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Loading({ visible }) {
+      if (!visible) return null;
+      return (
+        <div className="ai-loading-overlay">
+          <svg width="48" height="48" viewBox="0 0 50 50" style={{ animation: 'spin 1s linear infinite' }}>
+            <circle cx="25" cy="25" r="20" fill="none" stroke="#19c8b9" strokeWidth="4" strokeLinecap="round"
+              style={{ animation: 'spin 1.5s ease-in-out infinite' }} />
+          </svg>
+        </div>
+      );
+    }
+
+    function Table({ columns = [], dataSource = [], loading, emptyText = '暂无数据' }) {
+      return (
+        <div className="ai-table-wrap">
+          {loading && <Loading visible />}
+          <table className="ai-table"><thead><tr>{columns.map(c => <th key={c.key}>{c.title}</th>)}</tr></thead>
+            <tbody>{dataSource.length === 0 ? <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '60px 20px', color: '#9f927d' }}>{emptyText}</td></tr>
+              : dataSource.map((row, i) => <tr key={row.key || i}>{columns.map(c => <td key={c.key}>{c.render ? c.render(row[c.dataIndex], row) : row[c.dataIndex]}</td>)}</tr>)}
+            </tbody></table>
+        </div>
+      );
+    }
+
+    function Time() {
+      const [now, setNow] = useState(new Date());
+      useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
+      const weekdays = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+      const h24 = String(now.getHours()).padStart(2,'0');
+      const min = String(now.getMinutes()).padStart(2,'0');
+      return (
+        <div className="ai-time">
+          <div className="ai-time-date">
+            <div className="ai-time-weekday">{weekdays[now.getDay()]}</div>
+            <div className="ai-time-md">{now.getMonth()+1}/{now.getDate()}</div>
+          </div>
+          <div className="ai-time-clock">{h24}<span className="ai-time-colon">:</span>{min}</div>
+        </div>
+      );
+    }
+
+    function Divider({ type = 'line-brown' }) {
+      return <hr className={`ai-divider ai-divider--${type}`} />;
+    }
+
+    function Footer({ type = 'tree' }) {
+      return <div className={type === 'sea' ? 'ai-footer-sea' : 'ai-footer-tree'} />;
+    }
+
+    function Cursor({ children, forceAll = true }) {
+      const style = { cursor: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'%3E%3Cpath d=\'M4 0 L4 18 L8 14 L12 22 L15 20 L11 13 L17 13 Z\' fill=\'%2319c8b9\' stroke=\'%2311a89b\' stroke-width=\'1\'/%3E%3C/svg%3E") 4 0, auto' };
+      return <div style={style} className={forceAll ? 'animal-cursor' : ''}>{children}</div>;
+    }
+
+    function Typewriter({ children, speed = 90, trigger }) {
+      const [count, setCount] = useState(0);
+      const text = typeof children === 'string' ? children : '';
+      useEffect(() => { setCount(0); }, [trigger, text]);
+      useEffect(() => {
+        if (count >= text.length) return;
+        const t = setTimeout(() => setCount(c => c + 1), speed);
+        return () => clearTimeout(t);
+      }, [count, text, speed]);
+      return <>{text.slice(0, count)}</>;
+    }
+
+    function CodeBlock({ children }) {
+      return <pre className="ai-code-block"><code>{children}</code></pre>;
+    }
+
+    function Phone() {
+      const apps = [
+        { name: '相机', color: '#B77DEE', icon: '📷' }, { name: '应用', color: '#889DF0', icon: '📱' },
+        { name: '图鉴', color: '#F7CD67', icon: '📖' }, { name: 'DIY', color: '#E59266', icon: '🔨' },
+        { name: '购物', color: '#F8A6B2', icon: '🛒' }, { name: '设计', color: '#82D5BB', icon: '✏️' },
+        { name: '绿色', color: '#8AC68A', icon: '🌿' }, { name: '地图', color: '#FC736D', icon: '🗺️' },
+        { name: '聊天', color: '#D1DA49', icon: '💬' },
+      ];
+      return (
+        <div style={{ width: 200, borderRadius: 40, background: '#F8F4E8', overflow: 'hidden', padding: '16px 12px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', fontSize: 11, fontWeight: 800, color: '#DDDBCC', marginBottom: 8 }}>12:30</div>
+          <div style={{ textAlign: 'center', fontSize: 14, fontWeight: 800, color: '#725C4E', marginBottom: 12 }}>肠肠扁扁</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+            {apps.slice(0, 6).map(a => (
+              <div key={a.name} style={{ aspectRatio: '1', borderRadius: 16, background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{a.icon}</div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function WeddingInvitation({ title, subtitle, children }) {
+      return (
+        <div style={{ maxWidth: 420, margin: '0 auto', padding: '40px 28px 120px', borderRadius: 16,
+          background: 'radial-gradient(circle at 30% 20%,rgba(248,166,178,0.3),transparent 50%),radial-gradient(circle at 70% 80%,rgba(130,213,187,0.3),transparent 50%),rgb(247,243,223)',
+          filter: 'drop-shadow(0 10px 24px rgba(61,52,40,0.18))', position: 'relative', textAlign: 'center' }}>
+          {title && <Title color="app-pink" size="middle">{title}</Title>}
+          {subtitle && <p style={{ marginTop: 16, color: 'var(--text-body)' }}>{subtitle}</p>}
+          {children}
+        </div>
+      );
+    }
+
+    function WeddingInvitationExportButton({ onClick, children }) {
+      return <Button type="primary" onClick={onClick}>{children || '导出 PNG'}</Button>;
+    }
+
+    function NavMenu({ current, onNavigate, inDrawer }) {
+      return (
+        <>
+          {!inDrawer && <div className="sidebar-brand">🐾 肠肠扁扁</div>}
+          {NAV_ITEMS.map(item => (
+            <Button key={item.key} type="text" block
+              className={`nav-item ${current === item.key ? 'active' : ''}`}
+              onClick={() => onNavigate(item.key)}>
+              <span>{item.icon}</span><span>{item.label}</span>
+            </Button>
+          ))}
+        </>
+      );
+    }
+
+    function UserCenter({ user, onLogin, onLogout, onRequireAuth, isMobile }) {
+      const [menuOpen, setMenuOpen] = useState(false);
+      const ref = useRef(null);
+      useEffect(() => {
+        const fn = (e) => { if (ref.current && !ref.current.contains(e.target)) setMenuOpen(false); };
+        document.addEventListener(isMobile ? 'click' : 'mousedown', fn);
+        return () => document.removeEventListener(isMobile ? 'click' : 'mousedown', fn);
+      }, [isMobile]);
+
+      if (!user) {
+        return (
+          <div className="user-center">
+            <Button type="primary" size="small" onClick={onLogin}>登录</Button>
+            {!isMobile && <Button type="primary" size="small" onClick={onLogin}>注册</Button>}
+          </div>
+        );
+      }
+
+      const toggle = () => setMenuOpen(v => !v);
+
+      return (
+        <div className="user-center" ref={ref}
+          onMouseEnter={() => !isMobile && setMenuOpen(true)}
+          onMouseLeave={() => !isMobile && setMenuOpen(false)}>
+          <div className="user-avatar" onClick={isMobile ? toggle : undefined} title={user.nickname} role="button" tabIndex={0}>
+            {user.nickname?.[0] || 'U'}
+          </div>
+          {menuOpen && (
+            <div className="user-menu" style={{ minHeight: 180 }}>
+              <div className="user-menu-name">{user.nickname}</div>
+              <Button type="text" block className="user-menu-item">个人中心</Button>
+              <Button type="text" block className="user-menu-item" onClick={() => onRequireAuth?.('favorite')}>收藏夹</Button>
+              <Button type="text" block className="user-menu-item" onClick={onLogout}>退出登录</Button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function Carousel({ slides }) {
+      const [idx, setIdx] = useState(0);
+      useEffect(() => {
+        const t = setInterval(() => setIdx(i => (i + 1) % slides.length), 4000);
+        return () => clearInterval(t);
+      }, [slides.length]);
+      const prev = () => setIdx(i => (i - 1 + slides.length) % slides.length);
+      const next = () => setIdx(i => (i + 1) % slides.length);
+      return (
+        <div className="carousel">
+          {slides.map((s, i) => (
+            <div key={s.id} className={`carousel-slide ${i === idx ? 'active' : ''}`}
+              style={{ background: s.gradient }}>
+              <span style={{ fontSize: 28, fontWeight: 800, color: '#fff', textShadow: '0 2px 8px rgba(61,52,40,0.3)', letterSpacing: '0.04em' }}>{s.label}</span>
+            </div>
+          ))}
+          <div className="carousel-arrows">
+            <Button type="default" size="small" onClick={prev}>‹</Button>
+            <Button type="default" size="small" onClick={next}>›</Button>
+          </div>
+          <div className="carousel-dots">
+            {slides.map((s, i) => (
+              <button key={s.id} type="button" className={`carousel-dot ${i === idx ? 'active' : ''}`} onClick={() => setIdx(i)} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function HomePage({ onNavigate, isMobile, user, onRequireAuth }) {
+      const announceItems = ANNOUNCEMENTS.map(a => ({
+        key: String(a.id),
+        label: <><span style={{ fontSize: 12, color: 'var(--text-secondary)', marginRight: 8 }}>{a.date}</span>{a.title}</>,
+        children: <p style={{ lineHeight: 1.7 }}>{a.content}</p>,
+      }));
+
+      return (
+        <div>
+          <div className="section-title"><Title color="app-teal" size="large">肠肠扁扁宠咖</Title></div>
+          <div className="hero-row">
+            <div className="carousel-wrap"><Carousel slides={CAROUSEL_SLIDES} /></div>
+            <div className="store-info">
+              <Card pattern="app-teal" style={{ cursor: 'default' }} onClick={e => e.stopPropagation()}>
+                <div style={{ marginBottom: 12 }}><Title color="app-green" size="small">店铺介绍</Title></div>
+                <div className="info-row"><span className="info-label">📍 地址</span><span>湖南省长沙市天心区赤岭路82号细巷子湘银嘉园1栋107</span></div>
+                <div className="info-row"><span className="info-label">🕐 营业</span><span>周二至周日 13:00-21:00</span></div>
+                <div className="info-row"><span className="info-label">📞 电话</span><span>19217392520</span></div>
+                <Divider type="dashed-brown" />
+                <p style={{ lineHeight: 1.8, fontSize: 14 }}>
+                  <Typewriter trigger="home" speed={30}>我们希望能有一个机会，可以和自己心爱的小狗朝夕相处。而这份小小的愿望，慢慢长成了一个更大的梦想——打造一个健康、舒适的人宠社交空间。在这里，喜欢狗狗的朋友可以放松地和它们互动；而平时忙碌的铲屎官，也能安心地把狗狗托付给我们，让它们在这里结交同伴、收获人类的喜爱。希望您在这家小店里，不仅能喝到好喝的饮品，更能收获一段温暖治愈的时光。我们都相信，有些幸福，是小狗给的。</Typewriter>
+                </p>
+              </Card>
+              {!isMobile && <Time />}
+            </div>
+          </div>
+
+          <div className="announce-section">
+            <div style={{ marginBottom: 16 }}><Title color="app-yellow" size="middle">店铺公告</Title></div>
+            {isMobile ? (
+              <Collapse items={announceItems} defaultActiveKey={String(ANNOUNCEMENTS[0].id)} accordion />
+            ) : (
+              <Card pattern="app-yellow" style={{ cursor: 'default' }} onClick={e => e.stopPropagation()}>
+                <div className="announce-list">
+                  {ANNOUNCEMENTS.map((a, i) => (
+                    <div key={a.id} className="announce-item" style={i > 0 ? { borderTop: '1px dashed var(--border)', paddingTop: 12 } : {}}>
+                      <div className="announce-date">{a.date} {i === 0 && <span style={{ color: 'var(--error)', fontWeight: 700, marginLeft: 8 }}>最新</span>}</div>
+                      <div className="announce-title">{a.title}</div>
+                      <p style={{ fontSize: 14, color: 'var(--text-body)' }}>{a.content}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </div>
+
+          <Divider type="line-teal" />
+
+          <div className="featured-section">
+            <div className="featured-row">
+              <div className="featured-col">
+                <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Title color="app-pink" size="small">精选便利贴</Title>
+                  <Button type="link" size="small" onClick={() => onNavigate('messages')}>查看更多 →</Button>
+                </div>
+                <div className="sticky-scroll">
+                  {FEATURED_STICKIES.map(s => (
+                    <div key={s.id} className="sticky-card" onClick={() => onNavigate('messages')}>
+                      <Card pattern={s.color}>
+                        <p style={{ fontSize: 13, marginBottom: 8, minHeight: 48 }}>"{s.text}"</p>
+                        <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>— {s.author}</span>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="featured-col">
+                <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Title color="app-blue" size="small">热门表情包</Title>
+                  <Button type="link" size="small" onClick={() => onNavigate('emoji')}>查看更多 →</Button>
+                </div>
+                <div className="emoji-scroll">
+                  {FEATURED_EMOJIS.map(e => (
+                    <div key={e.id} className="emoji-card" onClick={() => onNavigate('emoji')}>
+                      <Card pattern="app-blue">
+                        <div className="emoji-thumb">{e.emoji}</div>
+                        <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600 }}>{e.name}</p>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function PlaceholderPage({ pageKey }) {
+      const item = NAV_ITEMS.find(n => n.key === pageKey);
+      const titleColors = { staff: 'app-green', menu: 'app-orange', messages: 'app-pink', emoji: 'app-blue', ranking: 'app-yellow' };
+      const cardPatterns = { staff: 'app-green', menu: 'app-orange', messages: 'app-pink', emoji: 'app-blue', ranking: 'app-yellow' };
+      return (
+        <div className="placeholder-page">
+          <Title color={titleColors[pageKey] || 'app-teal'} size="large">{item?.icon} {item?.label}</Title>
+          <p style={{ marginTop: 24, color: 'var(--text-secondary)' }}>此页面正在建设中，敬请期待～</p>
+          <div style={{ marginTop: 32, maxWidth: 400, margin: '32px auto 0' }}>
+            <Card pattern={cardPatterns[pageKey] || 'default'}>
+              <p>功能即将上线，可以先在首页逛逛店铺介绍和公告哦！</p>
+            </Card>
+          </div>
+        </div>
+      );
+    }
+
+    function LoginModal({ open, onClose, onSuccess }) {
+      const [mode, setMode] = useState('login');
+      return (
+        <Modal open={open} onClose={onClose} title={mode === 'login' ? '微信扫码登录' : '注册账号'}
+          okText="模拟登录成功" showCancel onOk={() => onSuccess({ id: 'u_' + Date.now(), nickname: '岛民' + Math.floor(Math.random()*1000) })}>
+          <p style={{ fontSize: 14, marginBottom: 8, color: 'var(--text-secondary)' }}>
+            基于 CloudBase 微信网页扫码登录（演示模式）
+          </p>
+          <div className="login-qr">微信扫码<br/>登录区域</div>
+          <p style={{ fontSize: 12, textAlign: 'center', color: 'var(--text-muted)' }}>请使用微信扫描二维码登录</p>
+          <div style={{ marginTop: 16, textAlign: 'center' }}>
+            <Button type="link" size="small" onClick={() => setMode(m => m === 'login' ? 'register' : 'login')}>
+              {mode === 'login' ? '没有账号？去注册' : '已有账号？去登录'}
+            </Button>
+          </div>
+        </Modal>
+      );
+    }
+
+    function App() {
+      const isMobile = useIsMobile();
+      const [page, setPage] = useState('home');
+      const [drawerOpen, setDrawerOpen] = useState(false);
+      const [user, setUser] = useState(null);
+      const [loginOpen, setLoginOpen] = useState(false);
+      const [pendingAction, setPendingAction] = useState(null);
+
+      const navigate = useCallback((key) => {
+        if (key === page) return;
+        setPage(key);
+        setDrawerOpen(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, [page]);
+
+      const requireAuth = useCallback((action) => {
+        if (!user) { setPendingAction(action); setLoginOpen(true); return false; }
+        return true;
+      }, [user]);
+
+      const handleLoginSuccess = (u) => {
+        setUser(u);
+        setLoginOpen(false);
+        if (pendingAction) setPendingAction(null);
+      };
+
+      const handleLogout = () => { setUser(null); setPendingAction(null); };
+
+      const pageContent = page === 'home'
+        ? <HomePage onNavigate={navigate} isMobile={isMobile} user={user} onRequireAuth={requireAuth} />
+        : <PlaceholderPage pageKey={page} />;
+
+      return (
+        <Cursor>
+          <div className="page-shell">
+            {!isMobile && (
+              <aside className="sidebar">
+                <NavMenu current={page} onNavigate={navigate} />
+              </aside>
+            )}
+
+            {isMobile && (
+              <>
+                <header className="mobile-header">
+                  <Button type="text" size="small" onClick={() => setDrawerOpen(true)}><Icon name="menu" size={22} color="#794f27" /></Button>
+                  <span className="mobile-title">肠肠扁扁</span>
+                  <UserCenter user={user} onLogin={() => setLoginOpen(true)} onLogout={handleLogout} onRequireAuth={requireAuth} isMobile />
+                </header>
+                <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={() => setDrawerOpen(false)} />
+                <nav className={`mobile-drawer ${drawerOpen ? 'open' : ''}`}>
+                  <div style={{ padding: '0 20px 16px', fontWeight: 800, fontSize: 18, color: 'var(--text)', borderBottom: '2px dashed var(--border)', marginBottom: 8 }}>🐾 肠肠扁扁</div>
+                  <NavMenu current={page} onNavigate={navigate} inDrawer />
+                </nav>
+              </>
+            )}
+
+            <div className="main-area">
+              {!isMobile && (
+                <div className="top-bar">
+                  <UserCenter user={user} onLogin={() => setLoginOpen(true)} onLogout={handleLogout} onRequireAuth={requireAuth} isMobile={false} />
+                </div>
+              )}
+              <main className="main-content">{pageContent}</main>
+              <div className="page-footer"><Footer type="tree" /></div>
+            </div>
+          </div>
+          <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onSuccess={handleLoginSuccess} />
+        </Cursor>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+/* 全局基础重置 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+}
+
+/* Element Plus 下拉菜单（teleport 到 body，需全局样式） */
+.user-dropdown-popper.el-popper {
+  min-width: 160px !important;
+  background: rgb(247, 243, 223) !important;
+  border: 2px solid #c4b89e !important;
+  border-radius: 18px !important;
+  box-shadow: 0 3px 10px rgba(61, 52, 40, 0.1) !important;
+}
+
+.user-dropdown-popper .el-dropdown-menu__item {
+  font-family: Nunito, 'Noto Sans SC', sans-serif;
+  font-weight: 500;
+  color: #725d42;
+}
+
+.user-dropdown-popper .el-dropdown-menu__item.is-disabled {
+  font-weight: 700;
+  color: #794f27;
+  opacity: 1;
+  border-bottom: 1px dashed #c4b89e;
+  margin-bottom: 4px;
+}
+
+.user-dropdown-popper .el-dropdown-menu__item:not(.is-disabled):hover {
+  background: rgba(25, 200, 185, 0.1);
+  color: #794f27;
+}
