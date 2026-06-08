@@ -31,7 +31,6 @@ npm run dev
 npm run build
 
 ## 📁 项目结构
-```
 ├── public/          # 静态资源
 ├── src/             # 核心代码
 │   ├── assets/      # 样式/图片/字体
@@ -41,7 +40,6 @@ npm run build
 │   └── main.ts      # 入口文件
 ├── README.md        # 项目说明
 └── vite.config.js   # 构建配置
-```
 
 ## 📝 使用说明
 - 本项目为纯前端展示页面，无后端接口，数据均为本地模拟。
